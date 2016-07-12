@@ -1,0 +1,2 @@
+/edx/xblock-simplevideo/judge/817c5a058013450faec0e306c3ef2a17/student/2016-07-12-05:09:28.cpp: In function ‘int main()’:
+/edx/xblock-simplevideo/judge/817c5a058013450faec0e306c3ef2a17/student/2016-07-12-05:09:28.cpp:4:22: warning: ignoring return value of ‘int scanf(const char*, ...)’, declared with attribute warn_unused_result [-Wunused-result]

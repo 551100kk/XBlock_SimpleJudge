@@ -1,3 +1,24 @@
 .simplevideo{
     margin: 20px;
 }
+textarea{
+    resize: none;
+}
+h1{
+    font-weight:bolder;
+}
+
+.Description pre{
+     margin:10px;
+}
+.Description span{
+     font-weight:bolder;
+     font-size:15pt;
+}
+hr{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.submission_status pre{
+    font-size: 90%;
+}
