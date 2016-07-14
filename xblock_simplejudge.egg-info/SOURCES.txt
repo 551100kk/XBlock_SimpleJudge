@@ -1,0 +1,7 @@
+simplejudge.py
+xblock_simplejudge.egg-info/PKG-INFO
+xblock_simplejudge.egg-info/SOURCES.txt
+xblock_simplejudge.egg-info/dependency_links.txt
+xblock_simplejudge.egg-info/entry_points.txt
+xblock_simplejudge.egg-info/requires.txt
+xblock_simplejudge.egg-info/top_level.txt

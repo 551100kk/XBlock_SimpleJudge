@@ -1,0 +1,4 @@
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-04:06:02.cpp:5:1: error: stray ‘\’ in program
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-04:06:02.cpp: In function ‘int main()’:
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-04:06:02.cpp:5:13: error: expected ‘)’ before ‘n’
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-04:06:02.cpp:4:20: warning: ignoring return value of ‘int scanf(const char*, ...)’, declared with attribute warn_unused_result [-Wunused-result]

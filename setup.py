@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='xblock-simplevideo',
+    name='xblock-simplejudge',
     version='0.1',
-    description='SimpleVideo XBlock Tutorial Sample',
-    py_modules=['simplevideo'],
+    description='SimpleJudge XBlock',
+    py_modules=['simplejudge'],
     install_requires=['XBlock'],
     entry_points={
         'xblock.v1': [
-            'simplevideo = simplevideo:SimpleVideoBlock',
+            'simplejudge = simplejudge:SimpleJudgeBlock',
         ]
     }
 )

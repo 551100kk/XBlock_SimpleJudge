@@ -1,0 +1,87 @@
+WARNING: Extended attributes are not restored.
+WARNING: EXT3_FEATURE_INCOMPAT_RECOVER is set.
+The partition should be unmounted to undelete any files without further data loss.
+If the partition is not currently mounted, this message indicates 
+it was improperly unmounted, and you should run fsck before continuing.
+If you decide to continue, extundelete may overwrite some of the deleted
+files and make recovering those files impossible.  You should unmount the
+file system and check it with fsck before using extundelete.
+Would you like to continue? (y/n) 
+Loading filesystem metadata ... 800 groups loaded.
+Contents of inode 3945674:
+0000 | fd 41 e8 03 00 10 00 00 90 f2 86 57 0c f4 86 57 | .A.........W...W
+0010 | 0c f4 86 57 00 00 00 00 e8 03 06 00 08 00 00 00 | ...W............
+0020 | 00 00 08 00 f3 04 00 00 0a f3 01 00 04 00 00 00 | ................
+0030 | 00 00 00 00 00 00 00 00 01 00 00 00 e3 25 f0 00 | .............%..
+0040 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | ................
+0050 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | ................
+0060 | 00 00 00 00 3d 2f b9 6a 00 00 00 00 00 00 00 00 | ....=/.j........
+0070 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | ................
+0080 | 00 00 00 00 00 00 00 00 31 00 00 00 00 00 00 00 | ........1.......
+0090 | e0 02 87 00 00 00 00 00 6c 03 f0 00 00 00 00 00 | ........l.......
+00a0 | 00 00 00 00 04 00 00 00 01 00 00 00 00 00 00 00 | ................
+00b0 | f0 12 87 00 00 00 00 00 11 10 00 00 00 00 00 00 | ................
+00c0 | a4 81 e8 03 6f 03 00 00 02 49 7b 57 02 49 7b 57 | ....o....I{W.I{W
+00d0 | 02 49 7b 57 00 00 00 00 e8 03 01 00 08 00 00 00 | .I{W............
+00e0 | 00 00 08 00 01 00 00 00 0a f3 01 00 04 00 00 00 | ................
+00f0 | 00 00 00 00 00 00 00 00 01 00 00 00 a2 a2 f0 00 | ................
+
+Inode is Allocated
+Group: 481
+File mode: 16893
+Low 16 bits of Owner Uid: 1000
+Size in bytes: 4096
+Access time: 1468461712
+Creation time: 1468462092
+Modification time: 1468462092
+Deletion Time: 0
+Low 16 bits of Group Id: 1000
+Links count: 6
+Blocks count: 8
+File flags: 524288
+File version (for NFS): 1790521149
+File ACL: 0
+Directory ACL: 0
+Fragment address: 0
+Direct blocks: 127754, 4, 0, 0, 1, 15738339, 0, 0, 0, 0, 0, 0
+Indirect block: 0
+Double indirect block: 0
+Triple indirect block: 0
+
+File name                                       | Inode number | Deleted status
+Directory block 15738339:
+.                                                 3945674
+..                                                3674197
+.git                                              3945675
+1.in                                              3932258
+1.in~                                             3932262
+1.out                                             3932263
+1.out~                                            3933303
+Makefile~                                         3936161
+README.md                                         3941460
+a.out                                             3941468
+compile.sh~                                       3941479
+execute.sh~                                       3941480
+judge                                             3941482
+log.txt                                           3941773
+main.cpp                                          3941774
+main.cpp~                                         3941775
+ooo                                               3941776
+ooo~                                              3941777
+out.txt                                           3941778
+out.txt~                                          3941779
+requirements.txt                                  3941780
+requirements.txt~                                 3941781
+setup.py                                          3941782
+simplevideo.py                                    3941783
+simplevideo.pyc                                   3941784
+static                                            3941785
+test.py                                           3941805
+test.sh                                           3941806
+test.sh~                                          3941807
+tmp.in                                            3941808
+tmp.in~                                           3941809
+xblock_simplevideo.egg-info                       3941810
+simplejudge.py                                    3932253
+out                                               3932256
+simplejudge.pyc                                   3941641        Deleted
