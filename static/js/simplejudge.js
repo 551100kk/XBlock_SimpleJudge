@@ -1,25 +1,52 @@
-function runcode(runtime,element,hashvalue,codetime){
-    $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-info" role="alert" style="min-width:0px; width:100%"><strong>Running...</strong></pre>';
+function history(runtime, element, hashvalue){
+    $.ajax({
+        type: "POST",
+        url: runtime.handlerUrl(element, 'submission'),
+        data: JSON.stringify({hash:hashvalue}),
+        success: function(result) {
+            console.log(result.date);
+            console.log(result.result);
+            console.log(result.code);
+            html_str = "";
+            for(var i = result.date.length - 1; i >= 0; i--){
+                if(result.result[i]=='Accepted') html_str += '<tr class="success">\n';
+                if(result.result[i]=='Wrong Answer') html_str += '<tr class="danger">\n';
+                if(result.result[i]=='Runtime Error') html_str += '<tr class="danger">\n';
+                if(result.result[i]=='Time Limit Exceed') html_str += '<tr class="danger">\n';
+                if(result.result[i]=='Compilation Error') html_str += '<tr class="warning">\n';
+                html_str += '   <th>' + (result.date.length - i)  + '</th>\n';
+                html_str += '   <th>' + result.date[i]  + '</th>\n';
+                html_str += '   <th>' + result.result[i]  + '</th>\n';
+                html_str += '   <th>Open</th>\n';
+                html_str += '</tr>\n'
+            }
+            $(element).find('.submission_table')[0].innerHTML = html_str;
+        }
+    });
+}
+
+function runcode(runtime, element, hashvalue, codetime){
+    $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-info" role="alert" style="min-width:0px; width:100%"><strong>Running...</strong></pre>';
     $.ajax({
         type: "POST",
         url: runtime.handlerUrl(element, 'runcode'),
-        data: JSON.stringify({code: $(element).find('textarea[name=code]').val(),hash:hashvalue,time:codetime}),
+        data: JSON.stringify({code: $(element).find('textarea[name=code]').val(), hash:hashvalue, time:codetime}),
         success: function(result) {
             console.log(result.result);
             console.log(result.comment);
-            if(result.result=='ac'){
-                $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-success" role="alert" style="min-width:0px; width:100%"><strong>Accepted!</strong></pre>';
+            if(result.result == 'ac'){
+                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-success" role="alert" style="min-width:0px; width:100%"><strong>Accepted!</strong></pre>';
             }
-            else if(result.result=='re'){
-                $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Runtime Error!</strong><br><br>'
-                +result.comment+'</pre>';
+            else if(result.result == 're'){
+                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Runtime Error!</strong><br><br></pre>';
             }
-            else if(result.result=='tle'){
-                $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Time Limit Exceed!</strong></pre>';
+            else if(result.result == 'tle'){
+                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Time Limit Exceed!</strong></pre>';
             }
             else{
-                $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Wrong Answer!</strong></pre>';
+                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Wrong Answer!</strong></pre>';
             }
+            history(runtime, element, hashvalue);
         }
     });
 }
@@ -39,6 +66,7 @@ function compile(runtime,element,hashvalue,codetime){
             else{
                 $(element).find('.submission_status')[0].innerHTML='<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Compilation Error!</strong><br><br>'
                 +result.comment+'</pre>';
+                history(runtime, element, hashvalue);
             }
         }
     });
@@ -66,18 +94,19 @@ function submit(runtime,element,hashvalue){
 
 function main(runtime, element){
     //get hashvalue of the block
-    var block=$(element)[0].getAttribute('data-usage-id');
-    var hashvalue="",cnt=0;
-    for(var i=0;i<block.length;i++){
+    var block = $(element)[0].getAttribute('data-usage-id');
+    var hashvalue = "", cnt = 0;
+    for(var i=0; i<block.length; i++){
         if(cnt==2){
-            hashvalue+=block[i];
+            hashvalue += block[i];
         }
-        if(block[i]=='@') cnt++;
+        if(block[i] == '@') cnt++;
     }
     $(element).find('.clear-button').bind('click', function() {
         $(element).find('textarea[name=code]').val("");
     });
     $(element).find('.save-button').bind('click',function(){
-        submit(runtime,element,hashvalue);
+        submit(runtime, element, hashvalue);
     });
+    history(runtime, element, hashvalue);
 }

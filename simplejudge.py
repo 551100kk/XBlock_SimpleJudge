@@ -79,9 +79,8 @@ class SimpleJudgeBlock(XBlock):
             path=os.path.join(path,self.get_user_id())
             os.system('mkdir -p '+path)
             path=os.path.join(path,codetime+'.cpp')
-            f=open(path,"w")
-            f.write(data.get('code'))
-            f.close()
+            with open(path,"w") as f:
+                f.write(data.get('code'))
         except:
             return {'result': 'error'}
         return {'result': 'success','time':codetime}
@@ -95,59 +94,89 @@ class SimpleJudgeBlock(XBlock):
         path=os.path.join(path,self.get_user_id())
         logfile=os.path.join(path,data.get('time')+'compile.log')
         cppfile=os.path.join(path,data.get('time')+'.cpp')
+        resultfile=os.path.join(path,data.get('time')+'.re')
         exefile=os.path.join(path,data.get('time'))
         if os.path.exists(logfile):
             os.remove(logfile)
         os.system('sh '+shfile+' '+cppfile+' '+exefile+' > '+logfile+' 2>&1')
         if os.path.exists(exefile):
             return {'result': 'success'}
-        f=open(logfile,"r")
-        result=str(f.read())
-        f.close()
+        with open(logfile, 'r') as f:
+            result = str(f.read())
         try:
             path=os.path.join(path,'')
             result=result.replace(str(path),'')
         except:
             pass
+        with open(resultfile, 'w') as f:
+            f.write('Compilation Error')
         return {'result': 'error','comment':result}
 
     @XBlock.json_handler    
-    def upload_testdata(self,data,suffix=''):
+    def upload_testdata(self, data, suffix=''):
         self.data_in.append(str(data.get('input_data')).encode('utf-8'))
         self.data_out.append(str(data.get('output_data')).encode('utf-8'))
         return {'result': 'success'}
 
     @XBlock.json_handler 
-    def runcode(self,data,suffix=''):
-        path=os.path.join(os.path.dirname(__file__),'judge')
-        path=os.path.join(path,data.get('hash'))
-        path=os.path.join(path,self.get_user_id())
-        exefile=os.path.join(path,data.get('time'))
-        logfile=os.path.join(path,'stderr.log')
-        shfile=os.path.join(path,'run.sh')
-        ansinfile=os.path.join(path,'in.txt')
-        ansoutfile=os.path.join(path,'out.txt')
-        outfile=os.path.join(path,'run_out.txt')
-        #for i in range(len(data_in)):
-        f=open(ansinfile,'w')
-        f.write(str(self.data_in[0]))
-        f.close()
+    def runcode(self, data, suffix=''):
+        path = os.path.join(os.path.dirname(__file__), 'judge')
+        path = os.path.join(path, data.get('hash'))
+        path = os.path.join(path, self.get_user_id())
+        exefile = os.path.join(path, data.get('time'))
+        logfile = os.path.join(path, 'stderr.log')
+        resultfile=os.path.join(path,data.get('time')+'.re')
+        shfile = os.path.join(path, 'run.sh')
+        ansinfile = os.path.join(path, 'in.txt')
+        ansoutfile = os.path.join(path, 'out.txt')
+        outfile = os.path.join(path, 'run_out.txt')
+        for i in range(len(self.data_in)):
+            f=open(ansinfile,'w')
+            f.write(str(self.data_in[i]))
+            f.close()
 
-        f=open(ansoutfile,'w')
-        f.write(str(self.data_out[0]))
-        f.close()
+            f=open(ansoutfile,'w')
+            f.write(str(self.data_out[i]))
+            f.close()
 
-        cmd=('"%s < %s > %s"' % (exefile,ansinfile,outfile))
-        s = EasyProcess('timeout 5 bash -c '+cmd).call(timeout=2)
+            cmd=('"%s < %s > %s"' % (exefile,ansinfile,outfile))
+            s = EasyProcess('timeout 5 bash -c '+cmd).call(timeout=2)
 
-        if s.timeout_happened:
-            return {'result': 'tle'}
-        if s.return_code:
-            return {'result': 're'}
+            if s.timeout_happened:
+                with open(resultfile, 'w') as f:
+                    f.write('Time Limit Exceed')
+                return {'result': 'tle'}
+            if s.return_code:
+                with open(resultfile, 'w') as f:
+                    f.write('Runtime Error')
+                return {'result': 're'}
 
-        cmd=('diff -B %s %s' % (ansoutfile,outfile))
-        s = EasyProcess(cmd).call()
-        if s.stdout!="":
-            return {'result': 'wa'}
+            cmd = ('diff -B %s %s' % (ansoutfile,outfile))
+            s = EasyProcess(cmd).call()
+            if s.stdout != "":
+                with open(resultfile, 'w') as f:
+                    f.write('Wrong Answer')
+                return {'result': 'wa'}
+        with open(resultfile, 'w') as f:
+            f.write('Accepted')
         return {'result':'ac'}
 
+    @XBlock.json_handler 
+    def submission(self, data, suffix=''):
+        path = os.path.join(os.path.dirname(__file__), 'judge')
+        path = os.path.join(path, data.get('hash'))
+        path = os.path.join(path, self.get_user_id())
+        path = os.path.join(path, '')
+        cmd = '"ls %s | grep .cpp"' % path
+        date = EasyProcess('bash -c ' + cmd).call().stdout.split('\n')
+        date = [x.replace('.cpp','') for x in date]
+        if len(date) == 1 and date[0] == "":
+            date.pop(0)
+        result = []
+        code = []
+        for x in date:
+            cmd = '"cat %s"' % (path + x + '.re')
+            result.append(EasyProcess('bash -c ' + cmd).call().stdout)
+            cmd = '"cat %s"' % (path + x + '.cpp')
+            code.append(EasyProcess('bash -c ' + cmd).call().stdout)
+        return {'result': result, 'code': code, 'date': date}
