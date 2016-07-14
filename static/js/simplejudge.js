@@ -17,10 +17,24 @@ function history(runtime, element, hashvalue){
                 html_str += '   <th>' + (result.date.length - i)  + '</th>\n';
                 html_str += '   <th>' + result.date[i]  + '</th>\n';
                 html_str += '   <th>' + result.result[i]  + '</th>\n';
-                html_str += '   <th>Open</th>\n';
+                html_str += '   <th class="opencode" value="' + i + '">Open</th>\n';
                 html_str += '</tr>\n'
             }
             $(element).find('.submission_table')[0].innerHTML = html_str;
+            $(element).find('.opencode').bind('click', function() {
+                var tmp = this;
+                tmp.innerText = "Waiting...";
+                $.ajax({
+                    type: "POST",
+                    url: runtime.handlerUrl(element, 'codepad'),
+                    data: JSON.stringify({code:result.code[tmp.getAttribute('value')]}),
+                    success: function(result) {
+                        var newwin = window.open(); 
+                        newwin.location=result.url;
+                        tmp.innerText = "Open";
+                    }
+                });
+            });
         }
     });
 }
@@ -32,8 +46,6 @@ function runcode(runtime, element, hashvalue, codetime){
         url: runtime.handlerUrl(element, 'runcode'),
         data: JSON.stringify({code: $(element).find('textarea[name=code]').val(), hash:hashvalue, time:codetime}),
         success: function(result) {
-            console.log(result.result);
-            console.log(result.comment);
             if(result.result == 'ac'){
                 $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-success" role="alert" style="min-width:0px; width:100%"><strong>Accepted!</strong></pre>';
             }

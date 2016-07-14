@@ -11,6 +11,8 @@ from xblock.fragment import Fragment
 
 import os
 import time
+import urllib
+import urllib2
 from easyprocess import EasyProcess
 
 class SimpleJudgeBlock(XBlock):
@@ -180,3 +182,19 @@ class SimpleJudgeBlock(XBlock):
             cmd = '"cat %s"' % (path + x + '.cpp')
             code.append(EasyProcess('bash -c ' + cmd).call().stdout)
         return {'result': result, 'code': code, 'date': date}
+
+    @XBlock.json_handler 
+    def codepad(self, data, suffix=''):
+        url = "http://codepad.org"
+        request = urllib2.Request(url) 
+        request.add_header("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/51.0.2704.79 Chrome/51.0.2704.79 Safari/537.36")
+        form_data = {
+            "lang": "C++", 
+            "code": data.get('code'),
+            "submit": "Submit",
+        }
+
+        form_data = urllib.urlencode(form_data)
+        response = urllib2.urlopen(request, data=form_data, timeout=5)  
+        url = response.url
+        return {'url': url}
