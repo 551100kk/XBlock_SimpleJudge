@@ -17,7 +17,7 @@ function history(runtime, element, hashvalue){
                 html_str += '   <th>' + (result.date.length - i)  + '</th>\n';
                 html_str += '   <th>' + result.date[i]  + '</th>\n';
                 html_str += '   <th>' + result.result[i]  + '</th>\n';
-                html_str += '   <th class="opencode" value="' + i + '">Open</th>\n';
+                html_str += '   <th class="opencode" value="' + i + '" style="cursor:pointer">Open</th>\n';
                 html_str += '</tr>\n'
             }
             $(element).find('.submission_table')[0].innerHTML = html_str;

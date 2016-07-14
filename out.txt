@@ -1,3 +1,0 @@
-/edx/xblock-simplevideo/out.txt
-/edx/xblock-simplevideo
-/edx/xblock-simplevideo/judge/817c5a058013450faec0e306c3ef2a17/student/
