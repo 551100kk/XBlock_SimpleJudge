@@ -1,2 +1,0 @@
-/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-05:09:07.cpp: In function ‘int main()’:
-/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/2016-07-14-05:09:07.cpp:1:23: warning: division by zero [-Wdiv-by-zero]

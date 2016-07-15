@@ -7,10 +7,12 @@ function main(runtime, element) {
             pro_output: $(element).find('textarea[name=pro_output]').val(),
             sample_input: $(element).find('textarea[name=sample_input]').val(),
             sample_output: $(element).find('textarea[name=sample_output]').val(),
+            display_name: $(element).find('input[name=display_name]').val(),
         };
         runtime.notify('save', {state: 'start'});
         $.post(handlerUrl, JSON.stringify(data)).done(function(response) {
         runtime.notify('save', {state: 'end'});
+        location.reload();
         });
     });
 

@@ -25,8 +25,21 @@ class SimpleJudgeBlock(XBlock):
     data_in=List(scope=Scope.content)
     data_out=List(scope=Scope.content)
     
+    display_name = String(help="", default="Judge", scope=Scope.content) 
+
+    ac = Integer(help="", default=0, scope=Scope.user_state_summary)
+    wa = Integer(help="", default=0, scope=Scope.user_state_summary)
+    tle = Integer(help="", default=0, scope=Scope.user_state_summary)
+    ce = Integer(help="", default=0, scope=Scope.user_state_summary)
+    re = Integer(help="", default=0, scope=Scope.user_state_summary)
+
+    total_submited = Integer(help="", default=0, scope=Scope.user_state_summary)
+    total_solved = Integer(help="", default=0, scope=Scope.user_state_summary)
+
+    submited = Integer(help="", default=0, scope=Scope.user_state)
+    solved = Integer(help="", default=0, scope=Scope.user_state)
+
     def student_view(self,context):
-        
         #html
         html_str = pkg_resources.resource_string(__name__, "static/html/simplejudge.html")
         frag = Fragment(unicode(html_str).format(self=self))
@@ -39,11 +52,11 @@ class SimpleJudgeBlock(XBlock):
         #javascript
         js_str = pkg_resources.resource_string(__name__, "static/js/simplejudge.js")
         frag.add_javascript(unicode(js_str))
-        
-        #js_str = pkg_resources.resource_string(__name__, "static/js/jquery.min.js")
-        #frag.add_javascript(unicode(js_str))
-        #js_str = pkg_resources.resource_string(__name__, "static/js/bootstrap.min.js")
-        #frag.add_javascript(unicode(js_str))
+
+        js_str = pkg_resources.resource_string(__name__, "static/js/jquery.flot.js")
+        frag.add_javascript(unicode(js_str))
+        js_str = pkg_resources.resource_string(__name__, "static/js/jquery.flot.pie.js")
+        frag.add_javascript(unicode(js_str))
         frag.initialize_js('main')
         
         return frag
@@ -69,6 +82,7 @@ class SimpleJudgeBlock(XBlock):
         self.pro_output = data.get('pro_output')
         self.sample_input = data.get('sample_input')
         self.sample_output = data.get('sample_output')
+        self.display_name = data.get('display_name')
         return {'result': 'success'}
     
     @XBlock.json_handler
@@ -101,6 +115,11 @@ class SimpleJudgeBlock(XBlock):
         if os.path.exists(logfile):
             os.remove(logfile)
         os.system('sh '+shfile+' '+cppfile+' '+exefile+' > '+logfile+' 2>&1')
+
+        if self.submited == 0:
+            self.total_submited += 1
+        self.submited = 1
+
         if os.path.exists(exefile):
             return {'result': 'success'}
         with open(logfile, 'r') as f:
@@ -112,6 +131,7 @@ class SimpleJudgeBlock(XBlock):
             pass
         with open(resultfile, 'w') as f:
             f.write('Compilation Error')
+        self.ce += 1
         return {'result': 'error','comment':result}
 
     @XBlock.json_handler    
@@ -147,10 +167,12 @@ class SimpleJudgeBlock(XBlock):
             if s.timeout_happened:
                 with open(resultfile, 'w') as f:
                     f.write('Time Limit Exceed')
+                self.tle += 1
                 return {'result': 'tle'}
             if s.return_code:
                 with open(resultfile, 'w') as f:
                     f.write('Runtime Error')
+                self.re += 1
                 return {'result': 're'}
 
             cmd = ('diff -B %s %s' % (ansoutfile,outfile))
@@ -158,9 +180,16 @@ class SimpleJudgeBlock(XBlock):
             if s.stdout != "":
                 with open(resultfile, 'w') as f:
                     f.write('Wrong Answer')
+                self.wa += 1
                 return {'result': 'wa'}
         with open(resultfile, 'w') as f:
             f.write('Accepted')
+        self.ac += 1
+
+        if self.solved == 0:
+            self.total_solved += 1
+        self.solved = 1
+
         return {'result':'ac'}
 
     @XBlock.json_handler 
@@ -198,3 +227,7 @@ class SimpleJudgeBlock(XBlock):
         response = urllib2.urlopen(request, data=form_data, timeout=5)  
         url = response.url
         return {'url': url}
+
+    @XBlock.json_handler 
+    def statistic(self, data, suffix=''):
+        return{'ac': self.ac, 'wa': self.wa, 'ce': self.ce, 'tle': self.tle, 're': self.re, 'totalusers': self.total_submited, 'acusers': self.total_solved}

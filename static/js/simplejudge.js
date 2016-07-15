@@ -1,3 +1,48 @@
+function statistics(runtime, element){
+    var ac=1, tle=2, re=3, wa=4, ce, totalusers = 6, acusers = 7;
+    var arr=[1,2,3];
+    $.ajax({
+        type: "POST",
+        url: runtime.handlerUrl(element, 'statistic'),
+        data: JSON.stringify({}),
+        success: function(result) {
+            var dataSet = [
+                { label: "Accepted", data: result.ac, color: "#00A36A" },
+                { label: "Time Limit Exceed", data: result.tle, color: "#7D0096" },
+                { label: "Runtime Error", data: result.re, color: "#992B00" },
+                { label: "Wrong Answer", data: result.wa, color: "#DE000F" },
+                { label: "Compilation Error", data: result.ce, color: "#ED7B00" }    
+            ];
+            $.plot($(element).find('.placeholder'), dataSet, {
+                series: {
+                    pie: {
+                        show: true,     
+                        radius: 0.7,   
+                         
+                        label: {
+                            show:true,
+                            radius: 1.0,
+                            background: {
+                                opacity: 0,
+                                color: '#FFF'
+                            }
+                        }
+                    }
+                },  
+                grid: {
+                    hoverable: true,
+                },
+                legend: {
+                    show: true,
+                }
+            });
+            $(element).find('.totalusers')[0].innerText = result.totalusers;
+            $(element).find('.acusers')[0].innerText = result.acusers;        
+        }
+    });console.log(arr);
+    
+}
+
 function history(runtime, element, hashvalue){
     $.ajax({
         type: "POST",
@@ -37,6 +82,7 @@ function history(runtime, element, hashvalue){
             });
         }
     });
+    statistics(runtime, element);
 }
 
 function runcode(runtime, element, hashvalue, codetime){
@@ -120,5 +166,9 @@ function main(runtime, element){
     $(element).find('.save-button').bind('click',function(){
         submit(runtime, element, hashvalue);
     });
+    $(document).load(function (){
+        alert(123);
+    });
     history(runtime, element, hashvalue);
+    //statistics(runtime, element);
 }
