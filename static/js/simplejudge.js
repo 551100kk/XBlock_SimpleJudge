@@ -6,6 +6,18 @@ function statistics(runtime, element){
         url: runtime.handlerUrl(element, 'statistic'),
         data: JSON.stringify({}),
         success: function(result) {
+            if(result.solved){
+                $(element).find('.user_status')[0].innerHTML = "(Accepted)";
+                $(element).find('.user_status')[0].style.color = "green";
+            }
+            else if(result.submited){
+                $(element).find('.user_status')[0].innerHTML = "(Submitted)";
+                $(element).find('.user_status')[0].style.color = "red";
+            }
+            else{
+                $(element).find('.user_status')[0].innerHTML = "(No Submission)";
+                $(element).find('.user_status')[0].style.color = "blue";
+            }
             var dataSet = [
                 { label: "Accepted", data: result.ac, color: "#00A36A" },
                 { label: "Time Limit Exceed", data: result.tle, color: "#7D0096" },
@@ -49,9 +61,6 @@ function history(runtime, element, hashvalue){
         url: runtime.handlerUrl(element, 'submission'),
         data: JSON.stringify({hash:hashvalue}),
         success: function(result) {
-            console.log(result.date);
-            console.log(result.result);
-            console.log(result.code);
             html_str = "";
             for(var i = result.date.length - 1; i >= 0; i--){
                 if(result.result[i]=='Accepted') html_str += '<tr class="success">\n';

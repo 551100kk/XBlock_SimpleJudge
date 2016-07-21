@@ -31,14 +31,14 @@
         <li class="field comp-setting-entry is-set">
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="sample_input">Sample Input</label>
-                <textarea class="input setting-input" name="sample_input" id="sample_input" type="text" style="width: 45%;height:200px">{self.sample_input}</textarea>
+                <textarea class="input setting-input" name="sample_input" id="sample_input" type="text" style="width: 45%;height:100px">{self.sample_input}</textarea>
             </div>
             <span class="tip setting-help">Problem Sample Input</span>
         </li>
         <li class="field comp-setting-entry is-set">
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="sample_output">Sample Output</label>
-                <textarea class="input setting-input" name="sample_output" id="sample_output" type="text" style="width: 45%;height:200px">{self.sample_output}</textarea>
+                <textarea class="input setting-input" name="sample_output" id="sample_output" type="text" style="width: 45%;height:100px">{self.sample_output}</textarea>
             </div>
             <span class="tip setting-help">Problem Sample Output</span>
         </li>
@@ -52,13 +52,9 @@
                             <span class="control-label" for="testdata" style="font-weight:bolder">Test Datas</span><br><br>
                             <span class="tip setting-help">Problem Sample Output</span>
                         </div>
-                        <div class="col-md-4">
-                            <label class="control-label">Input file</label>
-                            <input id="data_in" type="file" style="width:100%">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="control-label">Output file</label>
-                            <input id="data_out" type="file" style="width:100%">
+                        <div class="col-md-8">
+                            <label class="control-label">Input file (a .zip file consists of .in/.out files)</label>
+                            <input id="data_in" type="file" accept="application/zip" style="width:100%">
                         </div>
                         <div class="col-md-2">
                             <br><a href="#" class="btn btn-info upload-button" id="upload-button" role="button" style="width:100%">Upload</a>
@@ -69,39 +65,11 @@
                         <div class="upload-status">
                         </div>
                     </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="panel-group" id="panel-in">
-                            % for i in range(len(data_in)):
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-in" href="#panel-in-element-${i}">Input #${i+1}</a>
-                                    </div>
-                                    <div id="panel-in-element-${i}" class="panel-collapse collapse in">
-                                        <div class="panel-body">
-                                            <pre>${data_in[i]}</pre>
-                                        </div>
-                                    </div>
-                                </div>
-                            % endfor
-                            </div>
+                    <div class="row jumbotron" style="padding: 20px; padding-top:0px;">
+                        <h3 style="font-weight:bolder">Files</h3>
+                        <div class="col-md-6 display_in">
                         </div>
-                        <div class="col-md-6">
-                            <div class="panel-group" id="panel-out">
-                            % for i in range(len(data_out)):
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-out" href="#panel-out-element-${i}">Output #${i+1}</a>
-                                    </div>
-                                    <div id="panel-out-element-${i}" class="panel-collapse collapse in">
-                                        <div class="panel-body">
-                                            <pre>${data_out[i]}</pre>
-                                        </div>
-                                    </div>
-                                </div>
-                            % endfor
-                            </div>
+                        <div class="col-md-6 display_out">
                         </div>
                     </div>
                 </div>

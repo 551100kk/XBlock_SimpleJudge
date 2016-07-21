@@ -13,6 +13,7 @@ import os
 import time
 import urllib
 import urllib2
+import base64
 from easyprocess import EasyProcess
 
 class SimpleJudgeBlock(XBlock):
@@ -22,6 +23,7 @@ class SimpleJudgeBlock(XBlock):
     sample_input = String(help="", default=None, scope=Scope.content)
     sample_output = String(help="", default=None, scope=Scope.content)
     
+    data_name=List(scope=Scope.content)
     data_in=List(scope=Scope.content)
     data_out=List(scope=Scope.content)
     
@@ -85,6 +87,58 @@ class SimpleJudgeBlock(XBlock):
         self.display_name = data.get('display_name')
         return {'result': 'success'}
     
+    @XBlock.json_handler    
+    def upload_testdata(self, data, suffix=''):
+        path = os.path.join(os.path.dirname(__file__), 'judge')
+        zipfile = os.path.join(path, 'tmp.zip')
+        desfile = os.path.join(path, 'tmp')
+        zipdata = data.get('zipdata')
+        zipdata = zipdata.replace('data:application/zip;base64,', '')
+        zipdata = base64.b64decode(zipdata)
+        with open(zipfile, 'wb') as f:
+            f.write(zipdata)
+        #extract
+        os.system('unzip %s -d %s' % (zipfile, desfile))
+
+        cmd = '"ls %s | grep .in"' % desfile
+        input_data = EasyProcess('bash -c ' + cmd).call().stdout.split('\n')
+        cmd = '"ls %s | grep .out"' % desfile
+        output_data = EasyProcess('bash -c ' + cmd).call().stdout.split('\n')
+        
+        #check files name
+        if len(input_data) != len(output_data):
+            os.system('rm %s' % zipfile)
+            os.system('rm -r %s' % desfile)
+            return {'result': '.in files does not match .out files'}
+
+        for x, y in zip(input_data, output_data):
+            if x.replace('.in', '') != y.replace('.out', ''):
+                os.system('rm %s' % zipfile)
+                os.system('rm -r %s' % desfile)
+                return {'result': '.in files does not match .out files'}
+
+        #read in out files
+        self.data_name = []
+        self.data_in = []
+        self.data_out = []
+
+        for x, y in zip(input_data, output_data):
+            self.data_name.append(x.replace('.in', ''))
+            path = os.path.join(desfile, x)
+            cmd = '"cat %s"' % (path)
+            self.data_in.append(EasyProcess('bash -c ' + cmd).call().stdout)
+            path = os.path.join(desfile, y)
+            cmd = '"cat %s"' % (path)
+            self.data_out.append(EasyProcess('bash -c ' + cmd).call().stdout)
+
+        os.system('rm %s' % zipfile)
+        os.system('rm -r %s' % desfile)
+        return {'result': 'success'}
+
+    @XBlock.json_handler    
+    def show_testdata(self, data, suffix=''):
+        return {'name': self.data_name, 'in': self.data_in, 'out': self.data_out}
+
     @XBlock.json_handler
     def submit_code(self,data,suffix=''):
         #saving code
@@ -134,12 +188,6 @@ class SimpleJudgeBlock(XBlock):
         self.ce += 1
         return {'result': 'error','comment':result}
 
-    @XBlock.json_handler    
-    def upload_testdata(self, data, suffix=''):
-        self.data_in.append(str(data.get('input_data')).encode('utf-8'))
-        self.data_out.append(str(data.get('output_data')).encode('utf-8'))
-        return {'result': 'success'}
-
     @XBlock.json_handler 
     def runcode(self, data, suffix=''):
         path = os.path.join(os.path.dirname(__file__), 'judge')
@@ -153,13 +201,11 @@ class SimpleJudgeBlock(XBlock):
         ansoutfile = os.path.join(path, 'out.txt')
         outfile = os.path.join(path, 'run_out.txt')
         for i in range(len(self.data_in)):
-            f=open(ansinfile,'w')
-            f.write(str(self.data_in[i]))
-            f.close()
+            with open(ansinfile,'w') as f:
+                f.write(str(self.data_in[i]))
 
-            f=open(ansoutfile,'w')
-            f.write(str(self.data_out[i]))
-            f.close()
+            with open(ansoutfile,'w') as f:
+                f.write(str(self.data_out[i]))
 
             cmd=('"%s < %s > %s"' % (exefile,ansinfile,outfile))
             s = EasyProcess('timeout 5 bash -c '+cmd).call(timeout=2)
@@ -175,8 +221,10 @@ class SimpleJudgeBlock(XBlock):
                 self.re += 1
                 return {'result': 're'}
 
-            cmd = ('diff -B %s %s' % (ansoutfile,outfile))
+            cmd = ('diff -bB %s %s' % (ansoutfile,outfile))
             s = EasyProcess(cmd).call()
+            with open(os.path.join(path, 'test.txt'), 'w') as f:
+                f.write(s.stdout)
             if s.stdout != "":
                 with open(resultfile, 'w') as f:
                     f.write('Wrong Answer')
@@ -230,4 +278,5 @@ class SimpleJudgeBlock(XBlock):
 
     @XBlock.json_handler 
     def statistic(self, data, suffix=''):
-        return{'ac': self.ac, 'wa': self.wa, 'ce': self.ce, 'tle': self.tle, 're': self.re, 'totalusers': self.total_submited, 'acusers': self.total_solved}
+        return {'ac': self.ac, 'wa': self.wa, 'ce': self.ce, 'tle': self.tle, 're': self.re, 
+                'totalusers': self.total_submited, 'acusers': self.total_solved, 'submited': self.submited, 'solved': self.solved}
