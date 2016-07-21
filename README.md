@@ -6,7 +6,7 @@ XBlock SimpleJudge is a plugin for training students' programming skill in edx
 
 Installation
 ------------
-1. Install Open edx platform
+**1. Install Open edx platform**
 
   Github:
   
@@ -16,7 +16,7 @@ Installation
   
   https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Devstack
 
-2. Install SimpleJudge and the requirements of it
+**2. Install SimpleJudge and the requirements of it**
   ``` 
   cd /edx/xblock-simplejudge/
   sudo -H -u edxapp bash
@@ -24,7 +24,7 @@ Installation
   pip install -r requirements.txt
   ```
 
-3. Restart cms/lms server
+**3. Restart cms/lms server**
   ```
   sudo /edx/bin/supervisorctl restart edxapp:
   ```
