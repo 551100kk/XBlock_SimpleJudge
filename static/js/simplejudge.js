@@ -49,7 +49,11 @@ function statistics(runtime, element){
                 }
             });
             $(element).find('.totalusers')[0].innerText = result.totalusers;
-            $(element).find('.acusers')[0].innerText = result.acusers;        
+            $(element).find('.acusers')[0].innerText = result.acusers; 
+
+            var str = result.Language;
+            if(str == 'JAVA') str += ' --- your class name must be "Main!"'
+            $(element).find('.lang')[0].innerText = str;
         }
     });console.log(arr);
     
@@ -105,7 +109,7 @@ function runcode(runtime, element, hashvalue, codetime){
                 $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-success" role="alert" style="min-width:0px; width:100%"><strong>Accepted!</strong></pre>';
             }
             else if(result.result == 're'){
-                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Runtime Error!</strong><br><br></pre>';
+                $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Runtime Error!</strong></pre>';
             }
             else if(result.result == 'tle'){
                 $(element).find('.submission_status')[0].innerHTML = '<pre class="alert alert-danger" role="alert" style="min-width:0px; width:100%"><strong>Time Limit Exceed!</strong></pre>';

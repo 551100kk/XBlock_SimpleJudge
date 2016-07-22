@@ -24,11 +24,13 @@ function testdata(runtime, element){
                 var num = result.name.indexOf(str.replace('.out', ''));
                 location.href = ("data:text/csv;charset=utf-8," + encodeURIComponent(result.out[num]));
             });
+            $('#sel1').val(result.Language);
         }
     }); 
 }
 function main(runtime, element) {
     $(element).find('.save-button').bind('click', function() {
+        console.log($('#sel1').val());
         var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
         var data = {
             Description: $(element).find('textarea[name=Description]').val(),
@@ -37,6 +39,7 @@ function main(runtime, element) {
             sample_input: $(element).find('textarea[name=sample_input]').val(),
             sample_output: $(element).find('textarea[name=sample_output]').val(),
             display_name: $(element).find('input[name=display_name]').val(),
+            Language: $('#sel1').val(),
         };
         runtime.notify('save', {state: 'start'});
         $.post(handlerUrl, JSON.stringify(data)).done(function(response) {

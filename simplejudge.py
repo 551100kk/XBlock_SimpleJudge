@@ -16,7 +16,14 @@ import urllib2
 import base64
 from easyprocess import EasyProcess
 
+import lang_C
+import lang_JAVA
+
 class SimpleJudgeBlock(XBlock):
+
+    #DATABASE
+
+    Language = String(help="", default='JAVA', scope=Scope.content)
     Description = String(help="", default=None, scope=Scope.content)
     pro_input = String(help="", default=None, scope=Scope.content)
     pro_output = String(help="", default=None, scope=Scope.content)
@@ -41,7 +48,20 @@ class SimpleJudgeBlock(XBlock):
     submited = Integer(help="", default=0, scope=Scope.user_state)
     solved = Integer(help="", default=0, scope=Scope.user_state)
 
+    #student
+    def reset(self):
+        self.ac = 0
+        self.wa = 0
+        self.tle = 0
+        self.ce = 0
+        self.re = 0
+        self.total_submited = 0
+        self.total_solved = 0
+        self.submited = 0
+        self.solved = 0
+
     def student_view(self,context):
+        #self.reset()
         #html
         html_str = pkg_resources.resource_string(__name__, "static/html/simplejudge.html")
         frag = Fragment(unicode(html_str).format(self=self))
@@ -62,7 +82,9 @@ class SimpleJudgeBlock(XBlock):
         frag.initialize_js('main')
         
         return frag
-        
+    
+    #studio
+
     def studio_view(self, context):
         #html
         html_str = pkg_resources.resource_string(__name__, "static/html/simplejudge_edit.html")
@@ -79,6 +101,7 @@ class SimpleJudgeBlock(XBlock):
     
     @XBlock.json_handler
     def studio_submit(self, data, suffix=''):
+        self.Language = data.get('Language')
         self.Description = data.get('Description')
         self.pro_input = data.get('pro_input')
         self.pro_output = data.get('pro_output')
@@ -137,128 +160,32 @@ class SimpleJudgeBlock(XBlock):
 
     @XBlock.json_handler    
     def show_testdata(self, data, suffix=''):
-        return {'name': self.data_name, 'in': self.data_in, 'out': self.data_out}
+        return {'name': self.data_name, 'in': self.data_in, 'out': self.data_out, 'Language': self.Language}
+
+
+    ############Judge Start############
+    lang = {
+        'C++': lang_C,
+        'JAVA': lang_JAVA,
+    }
 
     @XBlock.json_handler
     def submit_code(self,data,suffix=''):
-        #saving code
-        codetime=time.strftime("%Y-%m-%d-%H:%M:%S", time.localtime()) 
-        try:
-            path=os.path.join(os.path.dirname(__file__),"judge")
-            path=os.path.join(path,data.get('hash'))
-            path=os.path.join(path,self.get_user_id())
-            os.system('mkdir -p '+path)
-            path=os.path.join(path,codetime+'.cpp')
-            with open(path,"w") as f:
-                f.write(data.get('code'))
-        except:
-            return {'result': 'error'}
-        return {'result': 'success','time':codetime}
+        return self.lang[self.Language].submit_code(self, data) 
     
     @XBlock.json_handler    
     def compile_code(self,data,suffix=''):
-        #compiling code
-        path=os.path.join(os.path.dirname(__file__),'judge')
-        shfile=os.path.join(path,'compile.sh')
-        path=os.path.join(path,data.get('hash'))
-        path=os.path.join(path,self.get_user_id())
-        logfile=os.path.join(path,data.get('time')+'compile.log')
-        cppfile=os.path.join(path,data.get('time')+'.cpp')
-        resultfile=os.path.join(path,data.get('time')+'.re')
-        exefile=os.path.join(path,data.get('time'))
-        if os.path.exists(logfile):
-            os.remove(logfile)
-        os.system('sh '+shfile+' '+cppfile+' '+exefile+' > '+logfile+' 2>&1')
-
-        if self.submited == 0:
-            self.total_submited += 1
-        self.submited = 1
-
-        if os.path.exists(exefile):
-            return {'result': 'success'}
-        with open(logfile, 'r') as f:
-            result = str(f.read())
-        try:
-            path=os.path.join(path,'')
-            result=result.replace(str(path),'')
-        except:
-            pass
-        with open(resultfile, 'w') as f:
-            f.write('Compilation Error')
-        self.ce += 1
-        return {'result': 'error','comment':result}
+        return self.lang[self.Language].compile_code(self, data)
 
     @XBlock.json_handler 
     def runcode(self, data, suffix=''):
-        path = os.path.join(os.path.dirname(__file__), 'judge')
-        path = os.path.join(path, data.get('hash'))
-        path = os.path.join(path, self.get_user_id())
-        exefile = os.path.join(path, data.get('time'))
-        logfile = os.path.join(path, 'stderr.log')
-        resultfile=os.path.join(path,data.get('time')+'.re')
-        shfile = os.path.join(path, 'run.sh')
-        ansinfile = os.path.join(path, 'in.txt')
-        ansoutfile = os.path.join(path, 'out.txt')
-        outfile = os.path.join(path, 'run_out.txt')
-        for i in range(len(self.data_in)):
-            with open(ansinfile,'w') as f:
-                f.write(str(self.data_in[i]))
-
-            with open(ansoutfile,'w') as f:
-                f.write(str(self.data_out[i]))
-
-            cmd=('"%s < %s > %s"' % (exefile,ansinfile,outfile))
-            s = EasyProcess('timeout 5 bash -c '+cmd).call(timeout=2)
-
-            if s.timeout_happened:
-                with open(resultfile, 'w') as f:
-                    f.write('Time Limit Exceed')
-                self.tle += 1
-                return {'result': 'tle'}
-            if s.return_code:
-                with open(resultfile, 'w') as f:
-                    f.write('Runtime Error')
-                self.re += 1
-                return {'result': 're'}
-
-            cmd = ('diff -bB %s %s' % (ansoutfile,outfile))
-            s = EasyProcess(cmd).call()
-            with open(os.path.join(path, 'test.txt'), 'w') as f:
-                f.write(s.stdout)
-            if s.stdout != "":
-                with open(resultfile, 'w') as f:
-                    f.write('Wrong Answer')
-                self.wa += 1
-                return {'result': 'wa'}
-        with open(resultfile, 'w') as f:
-            f.write('Accepted')
-        self.ac += 1
-
-        if self.solved == 0:
-            self.total_solved += 1
-        self.solved = 1
-
-        return {'result':'ac'}
+        return self.lang[self.Language].runcode(self, data)
 
     @XBlock.json_handler 
     def submission(self, data, suffix=''):
-        path = os.path.join(os.path.dirname(__file__), 'judge')
-        path = os.path.join(path, data.get('hash'))
-        path = os.path.join(path, self.get_user_id())
-        path = os.path.join(path, '')
-        cmd = '"ls %s | grep .cpp"' % path
-        date = EasyProcess('bash -c ' + cmd).call().stdout.split('\n')
-        date = [x.replace('.cpp','') for x in date]
-        if len(date) == 1 and date[0] == "":
-            date.pop(0)
-        result = []
-        code = []
-        for x in date:
-            cmd = '"cat %s"' % (path + x + '.re')
-            result.append(EasyProcess('bash -c ' + cmd).call().stdout)
-            cmd = '"cat %s"' % (path + x + '.cpp')
-            code.append(EasyProcess('bash -c ' + cmd).call().stdout)
-        return {'result': result, 'code': code, 'date': date}
+        return self.lang[self.Language].submission(self, data)
+
+    ###################################
 
     @XBlock.json_handler 
     def codepad(self, data, suffix=''):
@@ -279,4 +206,4 @@ class SimpleJudgeBlock(XBlock):
     @XBlock.json_handler 
     def statistic(self, data, suffix=''):
         return {'ac': self.ac, 'wa': self.wa, 'ce': self.ce, 'tle': self.tle, 're': self.re, 
-                'totalusers': self.total_submited, 'acusers': self.total_solved, 'submited': self.submited, 'solved': self.solved}
+                'totalusers': self.total_submited, 'acusers': self.total_solved, 'submited': self.submited, 'solved': self.solved, 'Language': self.Language}
