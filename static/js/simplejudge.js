@@ -52,7 +52,7 @@ function statistics(runtime, element){
             $(element).find('.acusers')[0].innerText = result.acusers; 
 
             var str = result.Language;
-            if(str == 'JAVA') str += ' --- your class name must be "Main!"'
+            if(str == 'JAVA') str += ' --- your class name must be "Main" !'
             $(element).find('.lang')[0].innerText = str;
         }
     });console.log(arr);
@@ -80,7 +80,11 @@ function history(runtime, element, hashvalue){
             }
             $(element).find('.submission_table')[0].innerHTML = html_str;
             $(element).find('.opencode').bind('click', function() {
-                var tmp = this;
+
+                var wnd = window.open('title','title');
+                wnd.document.write('<pre>' + result.code[this.getAttribute('value')] + '</pre>');
+                wnd.document.title = result.date[this.getAttribute('value')];
+                /*var tmp = this;
                 tmp.innerText = "Waiting...";
                 $.ajax({
                     type: "POST",
@@ -91,7 +95,7 @@ function history(runtime, element, hashvalue){
                         newwin.location=result.url;
                         tmp.innerText = "Open";
                     }
-                });
+                });*/
             });
         }
     });

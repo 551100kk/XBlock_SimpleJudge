@@ -4,6 +4,6 @@ public class Main{
 		Scanner sc = new Scanner(System.in);
 		int a = sc.nextInt();
 		int b = sc.nextInt();
-		System.out.printf("%d\n",a+b);
+		while(true) System.out.printf("%d\n",a+b+2);
 	}
 }

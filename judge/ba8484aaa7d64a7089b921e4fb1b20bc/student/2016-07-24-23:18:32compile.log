@@ -1,0 +1,7 @@
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/Main.java:4: error: '(' or '[' expected
+		Scanner sc = new Scan ner(System.in);
+		                      ^
+/edx/xblock-simplejudge/judge/ba8484aaa7d64a7089b921e4fb1b20bc/student/Main.java:4: error: not a statement
+		Scanner sc = new Scan ner(System.in);
+		                         ^
+2 errors

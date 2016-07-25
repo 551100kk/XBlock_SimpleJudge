@@ -71,7 +71,7 @@ def runcode(self, data, suffix=''):
         with open(ansoutfile,'w') as f:
             f.write(str(self.data_out[i]))
 
-        cmd=('"timeout 5 java -classpath %s Main < %s > %s"' % (path, ansinfile, outfile))
+        cmd=('"( cmdpid=$BASHPID; (sleep 6; kill -9 $cmdpid) & exec  java -classpath %s Main < %s > %s )"' % (path, ansinfile, outfile))
         s = EasyProcess('bash -c ' + cmd).call(timeout=5)
 
         if s.timeout_happened:
