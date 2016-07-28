@@ -18,6 +18,8 @@ Installation
 
 **2. Install SimpleJudge and the requirements of it**
   ``` 
+  sudo apt-get install python3
+  
   cd /edx/xblock-simplejudge/
   sudo -H -u edxapp bash
   source /edx/app/edxapp/venvs/edxapp/bin/activate
