@@ -20,6 +20,9 @@ def submit_code(self, data):
     return {'result': 'success', 'time': codetime}
 
 def compile_code(self, data):
+    if self.submited == 0:
+        self.total_submited += 1
+    self.submited = 1
     return {'result': 'success'}
 
 def runcode(self, data, suffix=''):
