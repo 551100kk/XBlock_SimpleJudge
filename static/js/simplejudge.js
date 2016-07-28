@@ -58,7 +58,13 @@ function statistics(runtime, element){
     });console.log(arr);
     
 }
-
+function HtmlEncode(s)
+{
+    s = s.replace(/&/g, '&amp');
+    s = s.replace(/</g, '&lt');
+    s = s.replace(/>/g, '&gt');
+    return s;
+}
 function history(runtime, element, hashvalue){
     $.ajax({
         type: "POST",
@@ -79,11 +85,26 @@ function history(runtime, element, hashvalue){
                 html_str += '</tr>\n'
             }
             $(element).find('.submission_table')[0].innerHTML = html_str;
+            console.log(result.lang);
             $(element).find('.opencode').bind('click', function() {
-
-                var wnd = window.open('title','title');
-                wnd.document.write('<pre>' + result.code[this.getAttribute('value')] + '</pre>');
+                var lang = {
+                    'JAVA':'java',
+                    'C++':'c++'
+                }
+                var wnd = window.open();
+                wnd.document.write('<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/default.min.css">');
+                wnd.document.write('<scr' + 'ipt src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min.js"></scr' + 'ipt>');
+                wnd.document.write('<pre><code class="' + lang[result.lang] + '">' + HtmlEncode(result.code[this.getAttribute('value')]) + '</code></pre>');
                 wnd.document.title = result.date[this.getAttribute('value')];
+                (function check(){
+                    if(wnd.hljs){
+                        wnd.hljs.initHighlighting();
+                        return;
+                    }
+                    setTimeout(function(){
+                        check();
+                    },50);
+                })();
                 /*var tmp = this;
                 tmp.innerText = "Waiting...";
                 $.ajax({

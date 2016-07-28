@@ -111,4 +111,4 @@ def submission(self, data, suffix=''):
         result.append(EasyProcess('bash -c ' + cmd).call().stdout)
         cmd = '"cat %s"' % (path + x + '.cpp')
         code.append(EasyProcess('bash -c ' + cmd).call().stdout)
-    return {'result': result, 'code': code, 'date': date}
+    return {'result': result, 'code': code, 'date': date, 'lang': self.Language}

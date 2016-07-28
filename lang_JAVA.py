@@ -75,9 +75,6 @@ def runcode(self, data, suffix=''):
         s = EasyProcess('bash -c ' + cmd).call(timeout=5)
 
         if s.timeout_happened:
-            cmd = "ps -A | grep java | cut -d ' ' -f 1"
-            pid = EasyProcess('bash -c ' + cmd).call().stdout
-            #system('kill -9 %s' % pid)
             with open(resultfile, 'w') as f:
                 f.write('Time Limit Exceed')
             self.tle += 1
@@ -113,7 +110,7 @@ def submission(self, data, suffix=''):
     date = EasyProcess('bash -c ' + cmd).call().stdout.split('\n')
     date = [x.replace('.java','') for x in date if x != 'Main.java']
     if len(date) == 1 and date[0] == "":
-        date.pop(0)
+        date.pop()
     result = []
     code = []
     for x in date:
@@ -121,4 +118,4 @@ def submission(self, data, suffix=''):
         result.append(EasyProcess('bash -c ' + cmd).call().stdout)
         cmd = '"cat %s"' % (path + x + '.java')
         code.append(EasyProcess('bash -c ' + cmd).call().stdout)
-    return {'result': result, 'code': code, 'date': date}
+    return {'result': result, 'code': code, 'date': date, 'lang': self.Language}

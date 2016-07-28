@@ -18,6 +18,7 @@ from easyprocess import EasyProcess
 
 import lang_C
 import lang_JAVA
+import lang_python3
 
 class SimpleJudgeBlock(XBlock):
 
@@ -167,6 +168,7 @@ class SimpleJudgeBlock(XBlock):
     lang = {
         'C++': lang_C,
         'JAVA': lang_JAVA,
+        'python3': lang_python3,
     }
 
     @XBlock.json_handler
